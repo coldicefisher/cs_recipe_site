@@ -1,0 +1,29 @@
+version: '3.9'
+services:
+  blog-database:
+    image: mongo
+    ports:
+      - '27017:27017'
+
+  blog-backend:
+    build: ./backend
+    environment:
+      - DATABASE_URL=mongodb://blog-database:27017/blog
+      - PORT=3000
+    ports:
+      - '3000:3000'
+    depends_on:
+      - blog-database
+
+  blog-frontend:
+    build:
+      context: .
+      args:
+        VITE_BACKEND_URL: http://blog-backend:3000
+        PORT: 80
+        # VITE_BACKEND_URL: http://turkeys.com
+        # VITE_BACKEND_URL: https://super-duper-telegram-x4gw7j6ppw3p5qx-3001.app.github.dev/api/v1
+    ports:
+      - '3001:80'
+    depends_on:
+      - blog-backend

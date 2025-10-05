@@ -1,0 +1,32 @@
+version: '3.9'
+services:
+  blog-database:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+
+  blog-backend:
+    build: ./backend
+    environment:
+      - DATABASE_URL=mongodb://blog-database:27017/blog
+      - PORT=3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - blog-database
+    volumes:
+      - ./backend:/app
+    command: npm start
+
+  blog-frontend:
+    build:
+      context: .
+    environment:
+      - VITE_BACKEND_URL=http://localhost:3000/api/v1
+    ports:
+      - "5173:5173"
+    depends_on:
+      - blog-backend
+    volumes:
+      - .:/app
+    command: npm run dev -- --host 0.0.0.0 --port 5173
