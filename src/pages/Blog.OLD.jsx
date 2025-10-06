@@ -2,14 +2,14 @@
 // import { PostFilter } from '../components/PostFilter.jsx'
 // import { PostSorting } from '../components/PostSorting.jsx'
 // import { PostList } from '../components/PostList.jsx'
-
+// import { getPosts } from '../api/posts.js'
 import { CreateRecipe } from '../components/CreateRecipe.jsx'
 import { RecipeFilter } from '../components/RecipeFilter.jsx'
 import { RecipeSorting } from '../components/RecipeSorting.jsx'
 import { RecipeList } from '../components/RecipeList.jsx'
+import { getRecipes } from '../api/recipes.js'
 
 import { useQuery } from '@tanstack/react-query'
-import { getPosts } from '../api/posts.js'
 import { useState } from 'react'
 
 import { Header } from '../components/Header.jsx'
@@ -19,29 +19,29 @@ export function Blog() {
   const [sortBy, setSortBy] = useState('createdAt')
   const [sortOrder, setSortOrder] = useState('descending')
 
-  const recipesQuery = useQuery({
+  const postsQuery = useQuery({
     queryKey: ['posts', { author, sortBy, sortOrder }],
     queryFn: () => getPosts({ author, sortBy, sortOrder }),
   })
 
-  const recipes = recipesQuery.data ?? []
+  const posts = postsQuery.data ?? []
 
   return (
     <div style={{ padding: 8 }}>
       <Header />
       <br />
       <hr />
-      <CreateRecipe />
+      <CreatePost />
       <br />
       <hr />
       Filter By:
-      <RecipeFilter
+      <PostFilter
         field='author'
         value={author}
         onChange={(value) => setAuthor(value)}
       />
       <br />
-      <RecipeSorting
+      <PostSorting
         fields={['createdAt', 'updatedAt']}
         value={sortBy}
         onChange={(value) => setSortBy(value)}
@@ -49,7 +49,7 @@ export function Blog() {
         onOrderChange={(orderValue) => setSortOrder(orderValue)}
       />
       <hr />
-      <RecipeList recipes={recipes} />
+      <PostList posts={posts} />
     </div>
   )
 }
