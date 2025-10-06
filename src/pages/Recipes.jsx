@@ -1,23 +1,24 @@
+// pages/Recipes.jsx
+import { useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import { getRecipes } from '../api/recipes.js'
 
+import { Header } from '../components/Header.jsx'
 import { CreateRecipe } from '../components/CreateRecipe.jsx'
 import { RecipeFilter } from '../components/RecipeFilter.jsx'
 import { RecipeSorting } from '../components/RecipeSorting.jsx'
 import { RecipeList } from '../components/RecipeList.jsx'
+import { useParams } from 'react-router-dom'
 
-import { useQuery } from '@tanstack/react-query'
 
-import { useState } from 'react'
-
-import { Header } from '../components/Header.jsx'
-
-export function Blog() {
+export function Recipes() {
   const [author, setAuthor] = useState('')
   const [sortBy, setSortBy] = useState('createdAt')
   const [sortOrder, setSortOrder] = useState('descending')
 
   const recipesQuery = useQuery({
-    queryKey: ['posts', { author, sortBy, sortOrder }],
-    queryFn: () => getPosts({ author, sortBy, sortOrder }),
+    queryKey: ['recipes', { author, sortBy, sortOrder }],
+    queryFn: () => getRecipes({ author, sortBy, sortOrder }),
   })
 
   const recipes = recipesQuery.data ?? []
@@ -32,7 +33,7 @@ export function Blog() {
       <hr />
       Filter By:
       <RecipeFilter
-        field='author'
+        field="author"
         value={author}
         onChange={(value) => setAuthor(value)}
       />
@@ -42,10 +43,15 @@ export function Blog() {
         value={sortBy}
         onChange={(value) => setSortBy(value)}
         orderValue={sortOrder}
-        onOrderChange={(orderValue) => setSortOrder(orderValue)}
+        onOrderChange={(value) => setSortOrder(value)}
       />
       <hr />
-      <RecipeList recipes={recipes} />
+
+      {recipesQuery.isLoading && <div>Loading…</div>}
+      {recipesQuery.isError && <div>Failed to load recipes.</div>}
+      {!recipesQuery.isLoading && !recipesQuery.isError && (
+        <RecipeList recipes={recipes} />
+      )}
     </div>
   )
 }
